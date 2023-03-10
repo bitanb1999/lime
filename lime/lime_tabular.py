@@ -108,10 +108,14 @@ class TableDomainMapper(explanation.DomainMapper):
                                 weights))
             if not show_all:
                 out_list = [out_list[x[0]] for x in exp]
-        ret = u'''
+        return u'''
             %s.show_raw_tabular(%s, %d, %s);
-        ''' % (exp_object_name, json.dumps(out_list, ensure_ascii=False), label, div_name)
-        return ret
+        ''' % (
+            exp_object_name,
+            json.dumps(out_list, ensure_ascii=False),
+            label,
+            div_name,
+        )
 
 
 class LimeTabularExplainer(object):
@@ -292,9 +296,10 @@ class LimeTabularExplainer(object):
         """
         stat_keys = list(training_data_stats.keys())
         valid_stat_keys = ["means", "mins", "maxs", "stds", "feature_values", "feature_frequencies"]
-        missing_keys = list(set(valid_stat_keys) - set(stat_keys))
-        if len(missing_keys) > 0:
-            raise Exception("Missing keys in training_data_stats. Details: %s" % (missing_keys))
+        if missing_keys := list(set(valid_stat_keys) - set(stat_keys)):
+            raise Exception(
+                f"Missing keys in training_data_stats. Details: {missing_keys}"
+            )
 
     def explain_instance(self,
                          data_row,
@@ -382,10 +387,8 @@ class LimeTabularExplainer(object):
                     (Not log probabilities, or actual class predictions).
                     """)
             else:
-                raise ValueError("Your model outputs "
-                                 "arrays with {} dimensions".format(len(yss.shape)))
+                raise ValueError(f"Your model outputs arrays with {len(yss.shape)} dimensions")
 
-        # for regression, the output should be a one-dimensional array of predictions
         else:
             try:
                 if len(yss.shape) != 1 and len(yss[0].shape) == 1:
@@ -419,7 +422,7 @@ class LimeTabularExplainer(object):
             name = int(data_row[i])
             if i in self.categorical_names:
                 name = self.categorical_names[i][name]
-            feature_names[i] = '%s=%s' % (feature_names[i], name)
+            feature_names[i] = f'{feature_names[i]}={name}'
             values[i] = 'True'
         categorical_features = self.categorical_features
 
@@ -467,7 +470,7 @@ class LimeTabularExplainer(object):
 
         if self.mode == "regression":
             ret_exp.intercept[1] = ret_exp.intercept[0]
-            ret_exp.local_exp[1] = [x for x in ret_exp.local_exp[0]]
+            ret_exp.local_exp[1] = list(ret_exp.local_exp[0])
             ret_exp.local_exp[0] = [(i, -1 * j) for i, j in ret_exp.local_exp[1]]
 
         return ret_exp
@@ -521,7 +524,6 @@ class LimeTabularExplainer(object):
             if sampling_method == 'gaussian':
                 data = self.random_state.normal(0, 1, num_samples * num_cols
                                                 ).reshape(num_samples, num_cols)
-                data = np.array(data)
             elif sampling_method == 'lhs':
                 data = lhs(num_cols, samples=num_samples
                            ).reshape(num_samples, num_cols)
@@ -529,14 +531,12 @@ class LimeTabularExplainer(object):
                 stdvs = np.array([1]*num_cols)
                 for i in range(num_cols):
                     data[:, i] = norm(loc=means[i], scale=stdvs[i]).ppf(data[:, i])
-                data = np.array(data)
             else:
                 warnings.warn('''Invalid input for sampling_method.
                                  Defaulting to Gaussian sampling.''', UserWarning)
                 data = self.random_state.normal(0, 1, num_samples * num_cols
                                                 ).reshape(num_samples, num_cols)
-                data = np.array(data)
-
+            data = np.array(data)
             if self.sample_around_instance:
                 data = data * scale + instance_sample
             else:
@@ -647,8 +647,11 @@ class RecurrentTabularExplainer(LimeTabularExplainer):
             feature_names = ['feature%d' % i for i in range(n_features)]
 
         # Update the feature names
-        feature_names = ['{}_t-{}'.format(n, n_timesteps - (i + 1))
-                         for n in feature_names for i in range(n_timesteps)]
+        feature_names = [
+            f'{n}_t-{n_timesteps - (i + 1)}'
+            for n in feature_names
+            for i in range(n_timesteps)
+        ]
 
         # Send off the the super class to do its magic.
         super(RecurrentTabularExplainer, self).__init__(

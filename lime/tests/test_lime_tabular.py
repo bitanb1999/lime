@@ -54,12 +54,16 @@ class TestLimeTabular(unittest.TestCase):
 
         self.assertIsNotNone(exp)
         keys = [x[0] for x in exp.as_list()]
-        self.assertEqual(1,
-                         sum([1 if 'petal width' in x else 0 for x in keys]),
-                         "Petal Width is a major feature")
-        self.assertEqual(1,
-                         sum([1 if 'petal length' in x else 0 for x in keys]),
-                         "Petal Length is a major feature")
+        self.assertEqual(
+            1,
+            sum(1 if 'petal width' in x else 0 for x in keys),
+            "Petal Width is a major feature",
+        )
+        self.assertEqual(
+            1,
+            sum(1 if 'petal length' in x else 0 for x in keys),
+            "Petal Length is a major feature",
+        )
 
     def test_lime_explainer_good_regressor_synthetic_data(self):
         X, y = make_classification(n_samples=1000,
@@ -71,7 +75,7 @@ class TestLimeTabular(unittest.TestCase):
         rf = RandomForestClassifier(n_estimators=500)
         rf.fit(X, y)
         instance = np.random.randint(0, X.shape[0])
-        feature_names = ["feature" + str(i) for i in range(20)]
+        feature_names = [f"feature{str(i)}" for i in range(20)]
         explainer = LimeTabularExplainer(X,
                                          feature_names=feature_names,
                                          discretize_continuous=True)
@@ -91,7 +95,7 @@ class TestLimeTabular(unittest.TestCase):
         rf = RandomForestClassifier(n_estimators=500)
         rf.fit(X, y)
         instance = np.random.randint(0, X.shape[0])
-        feature_names = ["feature" + str(i) for i in range(n_features)]
+        feature_names = [f"feature{str(i)}" for i in range(n_features)]
         explainer = LimeTabularExplainer(X,
                                          feature_names=feature_names,
                                          discretize_continuous=True)
@@ -118,12 +122,16 @@ class TestLimeTabular(unittest.TestCase):
                                          num_features=2)
         self.assertIsNotNone(exp)
         keys = [x[0] for x in exp.as_list()]
-        self.assertEqual(1,
-                         sum([1 if 'petal width' in x else 0 for x in keys]),
-                         "Petal Width is a major feature")
-        self.assertEqual(1,
-                         sum([1 if 'petal length' in x else 0 for x in keys]),
-                         "Petal Length is a major feature")
+        self.assertEqual(
+            1,
+            sum(1 if 'petal width' in x else 0 for x in keys),
+            "Petal Width is a major feature",
+        )
+        self.assertEqual(
+            1,
+            sum(1 if 'petal length' in x else 0 for x in keys),
+            "Petal Length is a major feature",
+        )
 
     def test_lime_explainer_entropy_discretizer(self):
         np.random.seed(1)
@@ -145,12 +153,16 @@ class TestLimeTabular(unittest.TestCase):
         self.assertIsNotNone(exp)
         keys = [x[0] for x in exp.as_list()]
         print(keys)
-        self.assertEqual(1,
-                         sum([1 if 'petal width' in x else 0 for x in keys]),
-                         "Petal Width is a major feature")
-        self.assertEqual(1,
-                         sum([1 if 'petal length' in x else 0 for x in keys]),
-                         "Petal Length is a major feature")
+        self.assertEqual(
+            1,
+            sum(1 if 'petal width' in x else 0 for x in keys),
+            "Petal Width is a major feature",
+        )
+        self.assertEqual(
+            1,
+            sum(1 if 'petal length' in x else 0 for x in keys),
+            "Petal Length is a major feature",
+        )
 
     def test_lime_tabular_explainer_equal_random_state(self):
         X, y = make_classification(n_samples=1000,
@@ -162,7 +174,7 @@ class TestLimeTabular(unittest.TestCase):
         rf = RandomForestClassifier(n_estimators=500, random_state=10)
         rf.fit(X, y)
         instance = np.random.RandomState(10).randint(0, X.shape[0])
-        feature_names = ["feature" + str(i) for i in range(20)]
+        feature_names = [f"feature{str(i)}" for i in range(20)]
 
         # ----------------------------------------------------------------------
         # -------------------------Quartile Discretizer-------------------------
@@ -249,7 +261,7 @@ class TestLimeTabular(unittest.TestCase):
         rf = RandomForestClassifier(n_estimators=500, random_state=10)
         rf.fit(X, y)
         instance = np.random.RandomState(10).randint(0, X.shape[0])
-        feature_names = ["feature" + str(i) for i in range(20)]
+        feature_names = [f"feature{str(i)}" for i in range(20)]
 
         # ----------------------------------------------------------------------
         # -------------------------Quartile Discretizer-------------------------
@@ -618,15 +630,15 @@ class TestLimeTabular(unittest.TestCase):
             index = index+1
 
         # Descritized stats
-        data_stats = {}
-        data_stats["means"] = d_means
-        data_stats["stds"] = d_stds
-        data_stats["maxs"] = d_maxs
-        data_stats["mins"] = d_mins
-        data_stats["bins"] = d_bins_revised
-        data_stats["feature_values"] = feature_values
-        data_stats["feature_frequencies"] = feature_frequencies
-
+        data_stats = {
+            "means": d_means,
+            "stds": d_stds,
+            "maxs": d_maxs,
+            "mins": d_mins,
+            "bins": d_bins_revised,
+            "feature_values": feature_values,
+            "feature_frequencies": feature_frequencies,
+        }
         data = np.zeros((2, len(self.feature_names)))
         explainer = LimeTabularExplainer(
             data, feature_names=self.feature_names, random_state=10,
@@ -639,12 +651,16 @@ class TestLimeTabular(unittest.TestCase):
 
         self.assertIsNotNone(exp)
         keys = [x[0] for x in exp.as_list()]
-        self.assertEqual(1,
-                         sum([1 if 'petal width' in x else 0 for x in keys]),
-                         "Petal Width is a major feature")
-        self.assertEqual(1,
-                         sum([1 if 'petal length' in x else 0 for x in keys]),
-                         "Petal Length is a major feature")
+        self.assertEqual(
+            1,
+            sum(1 if 'petal width' in x else 0 for x in keys),
+            "Petal Width is a major feature",
+        )
+        self.assertEqual(
+            1,
+            sum(1 if 'petal length' in x else 0 for x in keys),
+            "Petal Length is a major feature",
+        )
 
 
 if __name__ == '__main__':

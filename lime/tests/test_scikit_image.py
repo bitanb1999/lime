@@ -90,10 +90,8 @@ class TestBaseWrapper(unittest.TestCase):
 
         # right arguments are kept and wrong dismmissed
         def baz_fn(a, b, c=True):
-            if c:
-                return a + b
-            else:
-                return a
+            return a + b if c else a
+
         obj_ = BaseWrapper(baz_fn, a=10, b=100, d=1000)
         self.assertEqual(obj_.filter_params(baz_fn), {'a': 10, 'b': 100})
 

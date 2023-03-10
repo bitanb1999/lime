@@ -108,9 +108,9 @@ class Explanation(object):
             self.max_value = 1.0
             self.dummy_label = 1
         else:
-            raise LimeError('Invalid explanation mode "{}". '
-                            'Should be either "classification" '
-                            'or "regression".'.format(mode))
+            raise LimeError(
+                f'Invalid explanation mode "{mode}". Should be either "classification" or "regression".'
+            )
 
     def available_labels(self):
         """
@@ -121,7 +121,7 @@ class Explanation(object):
         except AssertionError:
             raise NotImplementedError('Not supported for regression explanations.')
         else:
-            ans = self.top_labels if self.top_labels else self.local_exp.keys()
+            ans = self.top_labels or self.local_exp.keys()
             return list(ans)
 
     def as_list(self, label=1, **kwargs):
@@ -176,7 +176,7 @@ class Explanation(object):
         plt.barh(pos, vals, align='center', color=colors)
         plt.yticks(pos, names)
         if self.mode == "classification":
-            title = 'Local explanation for class %s' % self.class_names[label]
+            title = f'Local explanation for class {self.class_names[label]}'
         else:
             title = 'Local explanation'
         plt.title(title)
@@ -212,12 +212,11 @@ class Explanation(object):
         See as_html() for additional parameters.
 
         """
-        file_ = open(file_path, 'w', encoding='utf8')
-        file_.write(self.as_html(labels=labels,
-                                 predict_proba=predict_proba,
-                                 show_predicted_value=show_predicted_value,
-                                 **kwargs))
-        file_.close()
+        with open(file_path, 'w', encoding='utf8') as file_:
+            file_.write(self.as_html(labels=labels,
+                                     predict_proba=predict_proba,
+                                     show_predicted_value=show_predicted_value,
+                                     **kwargs))
 
     def as_html(self,
                 labels=None,

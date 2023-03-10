@@ -67,12 +67,16 @@ class SubmodularPick(object):
 
         # Generate Explanations
         self.explanations = []
-        for i in sample_indices:
-            self.explanations.append(
-                explainer.explain_instance(
-                    data[i], predict_fn, num_features=num_features,
-                    top_labels=top_labels,
-                    **kwargs))
+        self.explanations.extend(
+            explainer.explain_instance(
+                data[i],
+                predict_fn,
+                num_features=num_features,
+                top_labels=top_labels,
+                **kwargs
+            )
+            for i in sample_indices
+        )
         # Error handling
         try:
             num_exps_desired = int(num_exps_desired)

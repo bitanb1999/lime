@@ -37,15 +37,17 @@ class TextDomainMapper(explanation.DomainMapper):
             list of tuples (word, weight), or (word_positions, weight) if
             examples: ('bad', 1) or ('bad_3-6-12', 1)
         """
-        if positions:
-            exp = [('%s_%s' % (
-                self.indexed_string.word(x[0]),
-                '-'.join(
-                    map(str,
-                        self.indexed_string.string_position(x[0])))), x[1])
-                   for x in exp]
-        else:
-            exp = [(self.indexed_string.word(x[0]), x[1]) for x in exp]
+        exp = (
+            [
+                (
+                    f"{self.indexed_string.word(x[0])}_{'-'.join(map(str, self.indexed_string.string_position(x[0])))}",
+                    x[1],
+                )
+                for x in exp
+            ]
+            if positions
+            else [(self.indexed_string.word(x[0]), x[1]) for x in exp]
+        )
         return exp
 
     def visualize_instance_html(self, exp, label, div_name, exp_object_name,
@@ -71,11 +73,16 @@ class TextDomainMapper(explanation.DomainMapper):
         all_occurrences = list(itertools.chain.from_iterable(
             [itertools.product([x[0]], x[1], [x[2]]) for x in exp]))
         all_occurrences = [(x[0], int(x[1]), x[2]) for x in all_occurrences]
-        ret = '''
+        return '''
             %s.show_raw_text(%s, %d, %s, %s, %s);
-            ''' % (exp_object_name, json.dumps(all_occurrences), label,
-                   json.dumps(text), div_name, json.dumps(opacity))
-        return ret
+            ''' % (
+            exp_object_name,
+            json.dumps(all_occurrences),
+            label,
+            json.dumps(text),
+            div_name,
+            json.dumps(opacity),
+        )
 
 
 class IndexedString(object):
@@ -110,7 +117,7 @@ class IndexedString(object):
         else:
             # with the split_expression as a non-capturing group (?:), we don't need to filter out
             # the separator character from the split results.
-            splitter = re.compile(r'(%s)|$' % split_expression)
+            splitter = re.compile(f'({split_expression})|$')
             self.as_list = [s for s in splitter.split(self.raw) if s]
             non_word = splitter.match
 
@@ -174,11 +181,16 @@ class IndexedString(object):
         """
         mask = np.ones(self.as_np.shape[0], dtype='bool')
         mask[self.__get_idxs(words_to_remove)] = False
-        if not self.bow:
-            return ''.join(
-                [self.as_list[i] if mask[i] else self.mask_string
-                 for i in range(mask.shape[0])])
-        return ''.join([self.as_list[v] for v in mask.nonzero()[0]])
+        return (
+            ''.join([self.as_list[v] for v in mask.nonzero()[0]])
+            if self.bow
+            else ''.join(
+                [
+                    self.as_list[i] if mask[i] else self.mask_string
+                    for i in range(mask.shape[0])
+                ]
+            )
+        )
 
     @staticmethod
     def _segment_with_tokens(text, tokens):
@@ -283,11 +295,16 @@ class IndexedCharacters(object):
         """
         mask = np.ones(self.as_np.shape[0], dtype='bool')
         mask[self.__get_idxs(words_to_remove)] = False
-        if not self.bow:
-            return ''.join(
-                [self.as_list[i] if mask[i] else self.mask_string
-                 for i in range(mask.shape[0])])
-        return ''.join([self.as_list[v] for v in mask.nonzero()[0]])
+        return (
+            ''.join([self.as_list[v] for v in mask.nonzero()[0]])
+            if self.bow
+            else ''.join(
+                [
+                    self.as_list[i] if mask[i] else self.mask_string
+                    for i in range(mask.shape[0])
+                ]
+            )
+        )
 
     def __get_idxs(self, words):
         """Returns indexes to appropriate words."""

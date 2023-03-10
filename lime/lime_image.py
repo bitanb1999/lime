@@ -60,10 +60,7 @@ class ImageExplanation(object):
         image = self.image
         exp = self.local_exp[label]
         mask = np.zeros(segments.shape, segments.dtype)
-        if hide_rest:
-            temp = np.zeros(self.image.shape)
-        else:
-            temp = self.image.copy()
+        temp = np.zeros(self.image.shape) if hide_rest else self.image.copy()
         if positive_only:
             fs = [x[0] for x in exp
                   if x[1] > 0 and x[1] > min_weight][:num_features]
@@ -74,7 +71,6 @@ class ImageExplanation(object):
             for f in fs:
                 temp[segments == f] = image[segments == f].copy()
                 mask[segments == f] = 1
-            return temp, mask
         else:
             for f, w in exp[:num_features]:
                 if np.abs(w) < min_weight:
@@ -83,7 +79,8 @@ class ImageExplanation(object):
                 mask[segments == f] = -1 if w < 0 else 1
                 temp[segments == f] = image[segments == f].copy()
                 temp[segments == f, c] = np.max(image)
-            return temp, mask
+
+        return temp, mask
 
 
 class LimeImageExplainer(object):
